@@ -65,13 +65,13 @@ syn match ucodeNumber "\<\d\+\.\d\+\%([eE][+-]\?\d\+\)\?\>" " Float
 syn match ucodeNumber "\<\.\d\+\%([eE][+-]\?\d\+\)\?\>" " Float starting with .
 syn match ucodeNumber "\<\d\+[eE][+-]\?\d\+\>" " Scientific notation
 
-" Template strings with embedded expressions - MUST come before regular strings for priority
+" Strings MUST come before regex patterns to avoid conflicts with quotes in regex
+" Template strings with embedded expressions
 syn region ucodeTemplateString matchgroup=ucodeTemplateDelimiter start="`" end="`" contains=ucodeTemplateExpression,ucodeStringEscape
 syn region ucodeTemplateExpression matchgroup=ucodeTemplateExprDelimiter start="${" end="}" contained contains=@ucodeExpression
-" Regular strings - simplified pattern like the working test
+" Regular strings - simplified pattern
 syn region ucodeString start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=@Spell
 syn region ucodeString start=+'+ skip=+\\\\\|\\'+ end=+'+ contains=@Spell
-
 
 " String escape sequences
 syn match ucodeStringEscape "\\[nrtbfav\\'\"\\]" contained
@@ -80,8 +80,8 @@ syn match ucodeStringEscape "\\u[0-9a-fA-F]\{4}" contained
 syn match ucodeStringEscape "\\U[0-9a-fA-F]\{8}" contained
 syn match ucodeStringEscape "\\[0-7]\{1,3}" contained
 
-" Regular expressions (POSIX style in ucode) - fixed to avoid comment conflicts
-syn region ucodeRegex start=+\%(\%(^\|[=,([\!&|?:+\-*%<>]\)\s*\)\@<=/[^/*]+ skip=+\\\\\|\\/+ end=+/[gimuy]*+ contains=ucodeRegexEscape oneline
+" Regular expressions (POSIX style in ucode) - simple pattern after strings
+syn region ucodeRegex start=+/[^/*]+ skip=+\\\\\|\\/+ end=+/[gimuy]*+ oneline
 syn match ucodeRegexEscape "\\." contained
 
 " Template mode syntax (Jinja-like) - Enhanced
@@ -90,16 +90,16 @@ syn region ucodeTemplateOutput matchgroup=ucodeTemplateDelimiter start="{{" end=
 syn region ucodeTemplateBlockTrim matchgroup=ucodeTemplateDelimiter start="{%-\?" end="-\?%}" contains=@ucodeTemplateCode
 syn region ucodeTemplateOutputTrim matchgroup=ucodeTemplateDelimiter start="{{-\?" end="-\?}}" contains=@ucodeExpression
 
-" Operators - handle division carefully to avoid comment conflicts  
+" Operators - division removed to avoid regex conflicts
+" Division (/) is handled contextually - as regex /.../ or implicitly as operator
 syn match ucodeOperator "[-+*%]"
-syn match ucodeOperator "\%(\s\|^\|[=,([\!&|?:+\-*%<>]\)\@<=/\%(/\)\@!" " Division operator
 syn match ucodeOperator "[<>]=\?"
 syn match ucodeOperator "[!=]==\?"
 syn match ucodeOperator "&&\|||"
 syn match ucodeOperator "[&|^~]"
 syn match ucodeOperator "<<\|>>"
 syn match ucodeOperator "[-+*%&|^]=\?" " Assignment operators without division
-syn match ucodeOperator "\%(\s\|^\|[=,([\!&|?:+\-*%<>]\)\@<=/\%(/\)\@!=\?" " Division assignment
+" Division assignment (/=) removed to avoid regex conflicts
 syn match ucodeOperator "<<=\|>>="
 syn match ucodeOperator "++\|--"
 syn match ucodeOperator "??\|?\|:"
