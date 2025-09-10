@@ -15,9 +15,16 @@ set cpo&vim
 syn sync fromstart
 syn sync maxlines=100
 
-" Comments
+" Force comment synchronization to prevent string interference
+syn sync match ucodeSync grouphere NONE "//"
+syn sync match ucodeSync grouphere NONE "/\*"
+
+" Comment cluster for containment
+syn cluster ucodeComments contains=ucodeCommentLine,ucodeCommentBlock,ucodeTemplateComment
+
+" Comments - Working pattern from minimal test
 syn keyword ucodeTodo TODO FIXME XXX NOTE TBD HACK WARNING contained
-syn match ucodeCommentLine "\/\/.*" contains=@Spell,ucodeTodo
+syn match ucodeCommentLine "\/\/.*$" contains=@Spell,ucodeTodo
 syn region ucodeCommentBlock start="/\*" end="\*/" contains=@Spell,ucodeTodo
 " Template comments (Jinja-like)
 syn region ucodeTemplateComment start="{#" end="#}" contains=@Spell,ucodeTodo
@@ -61,9 +68,10 @@ syn match ucodeNumber "\<\d\+[eE][+-]\?\d\+\>" " Scientific notation
 " Template strings with embedded expressions - MUST come before regular strings for priority
 syn region ucodeTemplateString matchgroup=ucodeTemplateDelimiter start="`" end="`" contains=ucodeTemplateExpression,ucodeStringEscape
 syn region ucodeTemplateExpression matchgroup=ucodeTemplateExprDelimiter start="${" end="}" contained contains=@ucodeExpression
-" Regular strings
-syn region ucodeString start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=ucodeStringEscape,@Spell
-syn region ucodeString start=+'+ skip=+\\\\\|\\'+ end=+'+ contains=ucodeStringEscape,@Spell
+" Regular strings - simplified pattern like the working test
+syn region ucodeString start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=@Spell
+syn region ucodeString start=+'+ skip=+\\\\\|\\'+ end=+'+ contains=@Spell
+
 
 " String escape sequences
 syn match ucodeStringEscape "\\[nrtbfav\\'\"\\]" contained
@@ -72,8 +80,8 @@ syn match ucodeStringEscape "\\u[0-9a-fA-F]\{4}" contained
 syn match ucodeStringEscape "\\U[0-9a-fA-F]\{8}" contained
 syn match ucodeStringEscape "\\[0-7]\{1,3}" contained
 
-" Regular expressions (POSIX style in ucode)
-syn region ucodeRegex start=+/[^/*]+ skip=+\\\\\|\\/+ end=+/[gimuy]*+ contains=ucodeRegexEscape oneline
+" Regular expressions (POSIX style in ucode) - fixed to avoid comment conflicts
+syn region ucodeRegex start=+\%(\%(^\|[=,([\!&|?:+\-*%<>]\)\s*\)\@<=/[^/*]+ skip=+\\\\\|\\/+ end=+/[gimuy]*+ contains=ucodeRegexEscape oneline
 syn match ucodeRegexEscape "\\." contained
 
 " Template mode syntax (Jinja-like) - Enhanced
@@ -82,14 +90,16 @@ syn region ucodeTemplateOutput matchgroup=ucodeTemplateDelimiter start="{{" end=
 syn region ucodeTemplateBlockTrim matchgroup=ucodeTemplateDelimiter start="{%-\?" end="-\?%}" contains=@ucodeTemplateCode
 syn region ucodeTemplateOutputTrim matchgroup=ucodeTemplateDelimiter start="{{-\?" end="-\?}}" contains=@ucodeExpression
 
-" Operators
-syn match ucodeOperator "[-+*/%]"
+" Operators - handle division carefully to avoid comment conflicts  
+syn match ucodeOperator "[-+*%]"
+syn match ucodeOperator "\%(\s\|^\|[=,([\!&|?:+\-*%<>]\)\@<=/\%(/\)\@!" " Division operator
 syn match ucodeOperator "[<>]=\?"
 syn match ucodeOperator "[!=]==\?"
 syn match ucodeOperator "&&\|||"
 syn match ucodeOperator "[&|^~]"
 syn match ucodeOperator "<<\|>>"
-syn match ucodeOperator "[-+*/%&|^]=\?"
+syn match ucodeOperator "[-+*%&|^]=\?" " Assignment operators without division
+syn match ucodeOperator "\%(\s\|^\|[=,([\!&|?:+\-*%<>]\)\@<=/\%(/\)\@!=\?" " Division assignment
 syn match ucodeOperator "<<=\|>>="
 syn match ucodeOperator "++\|--"
 syn match ucodeOperator "??\|?\|:"
