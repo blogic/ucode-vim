@@ -1,0 +1,9 @@
+ft ucode
+absent ucodeJsError
+absent ucodeImportFrom   # from outside an import is an ordinary name
+absent ucodeImportAs
+
+3 5 ucodeVariableName   # from
+4 5 ucodeVariableName   # as
+5 5 ucodeVariableName   # of
+6 12 !ucodeImportFrom

@@ -1,0 +1,17 @@
+ft ucode
+absent ucodeCommentLine    # the // and /* inside strings are not comments
+absent ucodeCommentBlock
+
+1 10 ucodeString
+1 18 ucodeStringEscape          # \"
+2 18 ucodeStringEscape          # \'
+3 21 ucodeStringEscape          # the apostrophe that once broke the file
+4 20 ucodeStringEscape          # \x41
+4 31 ucodeStringEscape          # \101 octal
+5 17 ucodeString                # the // inside a string
+6 16 ucodeString                # the /* inside a string
+7 12 ucodeTemplateStringDelim   # backtick
+7 22 ucodeTemplateExprDelim     # ${
+7 24 ucodeTemplateExpr          # name
+7 39 ucodeDotOperator           # obj.prop inside an interpolation
+7 40 ucodePropertyName

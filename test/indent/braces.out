@@ -1,0 +1,15 @@
+function demo(a) {
+	let x = 1;
+	if (a) {
+		x = 2;
+	} else {
+		x = 3;
+	}
+	while (x > 0) {
+		x--;
+	}
+	let obj = {
+		key: 1,
+	};
+	return x;
+}

@@ -1,0 +1,8 @@
+ft ucode
+present ucodeSpaceError
+present ucodeSpaceErrorC
+
+2 14 ucodeSpaceError     # trailing tab on a code line
+3 39 ucodeSpaceErrorC    # trailing tab inside a block comment
+4 29 ucodeSpaceErrorC    # a space before a tab inside a block comment
+7 38 ucodeSpaceErrorC    # trailing tab inside a line comment

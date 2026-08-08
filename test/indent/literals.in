@@ -1,0 +1,8 @@
+function f(s) {
+let a = "{ not a brace";
+let b = '} neither is this';
+// { a brace in a line comment
+/* } a brace in a block comment */
+let c = match(s, /[{}]/);
+return a;
+}

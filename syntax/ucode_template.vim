@@ -1,43 +1,66 @@
-" Vim syntax file for UCODE Template Mode
-" Language: UCODE Template (OpenWrt template language)
-" Maintainer: Generated with Claude Code
-" Last Change: 2025-09-07
+" Vim syntax file
+" Language:    ucode template (ucode -T)
+" Maintainer:  John Crispin <john@phrozen.org>
+" URL:         https://github.com/blogic/ucode-vim
+"
+" Tag shapes are taken from the template state machine in lexer.c:
+"
+"   {#  {#-   comment   closed by  #}  -#}
+"   {{  {{-   expression           }}  -}}
+"   {%  {%-  {%+  statement        %}  -%}
+"
+" A { that is not followed by #, { or % is literal text. There is no {{+, and
+" +%} is a syntax error rather than a trim marker.
+"
+" ucode has no Jinja filter pipeline: {{ 6 | 1 }} renders 7, a bitwise or.
+"
+" Option:
+"   g:ucode_template_base  filetype to layer under the literal text, for
+"                          example "html". Empty by default, because a ucode
+"                          template usually renders a config file.
 
 if exists("b:current_syntax")
   finish
 endif
 
-" Include HTML as base syntax for templates
-runtime! syntax/html.vim
-unlet! b:current_syntax
+let s:cpo_save = &cpo
+set cpo&vim
 
-" Load ucode syntax into @ucodeCode cluster
+let s:base = get(g:, "ucode_template_base", "")
+if s:base !=# ""
+  execute "runtime! syntax/" . s:base . ".vim"
+  unlet! b:current_syntax
+endif
+
 syn include @ucodeCode syntax/ucode.vim
 unlet! b:current_syntax
 
-" Template tags and blocks
-syn region ucodeTemplateBlock matchgroup=ucodeTemplateDelimiter start="{%" end="%}" contains=@ucodeCode keepend
-syn region ucodeTemplateBlockTrim matchgroup=ucodeTemplateDelimiter start="{%-" end="-%}" contains=@ucodeCode keepend
-syn region ucodeTemplateOutput matchgroup=ucodeTemplateDelimiter start="{{" end="}}" contains=@ucodeCode keepend
-syn region ucodeTemplateOutputTrim matchgroup=ucodeTemplateDelimiter start="{{-" end="-}}" contains=@ucodeCode keepend
-syn region ucodeTemplateComment start="{#" end="#}" contains=ucodeTodo
+" A template region can begin anywhere, so the whole file has to be scanned.
+syn sync fromstart
 
-" Template control structures
-syn keyword ucodeTemplateKeyword if else elseif endif for endfor while endwhile block endblock include extends contained containedin=ucodeTemplateBlock,ucodeTemplateBlockTrim
-syn keyword ucodeTemplateFunction include print printf sprintf contained containedin=ucodeTemplateBlock,ucodeTemplateBlockTrim
+syn match ucodeTemplateShebang "\%^#!.*$"
 
-" Template filters (common ones)
-syn match ucodeTemplateFilter "|" contained containedin=ucodeTemplateOutput,ucodeTemplateOutputTrim nextgroup=ucodeTemplateFilterName skipwhite
-syn match ucodeTemplateFilterName "\<[a-zA-Z_][a-zA-Z0-9_]*\>" contained
+syn region ucodeTemplateComment keepend
+      \ matchgroup=ucodeTemplateDelim start="{#-\=" end="-\=#}"
+      \ contains=ucodeTodo,@Spell
 
-" Highlighting
-hi def link ucodeTemplateDelimiter PreProc
+syn region ucodeTemplateExprBlock keepend
+      \ matchgroup=ucodeTemplateDelim start="{{-\=" end="-\=}}"
+      \ contains=@ucodeCode
+
+syn region ucodeTemplateStmtBlock keepend
+      \ matchgroup=ucodeTemplateDelim start="{%[-+]\=" end="-\=%}"
+      \ contains=@ucodeCode
+
+hi def link ucodeTemplateShebang PreProc
+hi def link ucodeTemplateDelim PreProc
 hi def link ucodeTemplateComment Comment
-hi def link ucodeTemplateKeyword Statement
-hi def link ucodeTemplateFunction Function
-hi def link ucodeTemplateFilter Operator
-hi def link ucodeTemplateFilterName Function
+hi def link ucodeTemplateExprBlock Normal
+hi def link ucodeTemplateStmtBlock Normal
 
 let b:current_syntax = "ucode_template"
 
-" vim: ts=2 sw=2 et
+let &cpo = s:cpo_save
+unlet s:cpo_save
+
+" vim: ts=8 sw=2 et

@@ -1,0 +1,15 @@
+if (a)
+x();
+y();
+for (let i = 0; i < 2; i++)
+z(i);
+w();
+if (b)
+if (c)
+deep();
+after();
+if (d)
+one();
+else
+two();
+three();

@@ -1,0 +1,16 @@
+if (x == 1):
+print("one");
+elif (x == 2):
+print("two");
+else
+print("other");
+endif;
+for (let i = 0; i < 2; i++):
+print(i);
+endfor;
+while (0):
+print(1);
+endwhile;
+function altfn():
+print("alt");
+endfunction;

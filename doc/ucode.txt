@@ -1,0 +1,243 @@
+*ucode.txt*	Vim support for the ucode scripting language
+
+Author:   John Crispin <john@phrozen.org>
+Repo:     https://github.com/blogic/ucode-vim
+Licence:  ISC
+
+==============================================================================
+CONTENTS						*ucode-contents*
+
+	1. Introduction .......................... |ucode-introduction|
+	2. Installation .......................... |ucode-installation|
+	3. Filetype detection .................... |ucode-filetypes|
+	4. Options ............................... |ucode-options|
+	5. Syntax groups ......................... |ucode-syntax|
+	6. Errors flagged ........................ |ucode-errors|
+	7. Indentation ........................... |ucode-indent|
+	8. Filetype plugin ....................... |ucode-ftplugin|
+	9. Templates ............................. |ucode-templates|
+	10. Tests ................................ |ucode-tests|
+
+==============================================================================
+1. INTRODUCTION					*ucode-introduction*
+
+ucode is the scripting language OpenWrt uses. It looks like JavaScript and is
+not JavaScript: it has no classes, no `new`, no `throw`, no destructuring and
+no `undefined`, and it has block forms JavaScript does not, such as `elif` and
+`endif`.
+
+This plugin takes its keyword, builtin and module tables from the ucode
+sources, so what it colours as valid is what the compiler accepts.
+
+==============================================================================
+2. INSTALLATION					*ucode-installation*
+
+As a vim package: >
+
+	mkdir -p ~/.vim/pack/ucode/start
+	git clone https://github.com/blogic/ucode-vim \
+		~/.vim/pack/ucode/start/ucode-vim
+<
+In your |vimrc|: >
+
+	syntax on
+	filetype plugin indent on
+<
+`syntax on` by itself turns on filetype detection, and nothing else. Without
+`filetype plugin indent on` the |ucode-ftplugin| and |ucode-indent| files are
+never sourced, so 'commentstring', 'indentexpr', `gf` and `:make` stay at
+their defaults.
+
+No filetype autocommands are needed in your vimrc; see |ucode-filetypes|.
+
+==============================================================================
+3. FILETYPE DETECTION				*ucode-filetypes*
+
+	*.uc, *.ucode				ucode
+	*.uc.tmpl, *.ucode.tmpl, *.ut, *.utpl	ucode_template
+	#! line naming ucode			ucode, or ucode_template with -T
+
+Vim's own filetype.vim maps *.uc to UnrealScript. `ftdetect/ucode.vim`
+overrides it with an explicit `:set filetype=`, because `:setf` does nothing
+once the builtin rule has already fired.
+
+Nothing in a file name distinguishes a template from a script, so a .uc file
+that is really a template needs a modeline or |g:ucode_detect_templates|.
+
+==============================================================================
+4. OPTIONS						*ucode-options*
+
+						*g:ucode_space_errors*
+Default 1. Highlights trailing whitespace and a space before a tab, inside
+comments and strings as well as in code. >
+
+	let g:ucode_space_errors = 0
+<
+						*g:ucode_no_jsism_errors*
+Default 0. Set to 1 to stop flagging the JavaScript constructs listed under
+|ucode-errors|. >
+
+	let g:ucode_no_jsism_errors = 1
+<
+						*g:ucode_fold*
+Default 0. Folds block comments. >
+
+	let g:ucode_fold = 1
+<
+						*g:ucode_detect_templates*
+Default 0. Promotes a .uc file to ucode_template when one of its first 50
+lines begins with `{%`. Off by default because the heuristic is unproven. >
+
+	let g:ucode_detect_templates = 1
+<
+						*g:ucode_template_base*
+Default empty. Filetype to layer under a template's literal text. A ucode
+template usually renders a config file, so nothing is layered in unless you
+ask for it. >
+
+	let g:ucode_template_base = 'html'
+<
+==============================================================================
+5. SYNTAX GROUPS					*ucode-syntax*
+
+	ucodeConditional	if elif else endif switch case default
+	ucodeRepeat		while endwhile for endfor
+	ucodeBranch		break continue return
+	ucodeException		try catch
+	ucodeDeclaration	let const
+	ucodeFunction		function endfunction
+	ucodeImport		import export
+	ucodeImportFrom		from, in an import
+	ucodeImportAs		as, in a namespace import
+	ucodeOperatorKeyword	delete in
+	ucodeBoolean		true false
+	ucodeNull		null
+	ucodeThis		this
+	ucodeBuiltin		the 71 core functions
+	ucodeGlobal		ARGV REQUIRE_SEARCH_PATH modules NaN Infinity
+				global
+	ucodeModuleName		a bundled module, inside an import source string
+	ucodeModulePath		the source string itself
+	ucodeNumber		decimal, 0x, 0b, 0o and legacy 0NNN octal
+	ucodeFloat		fraction and exponent forms
+	ucodeString		' and " strings
+	ucodeStringEscape	\uHHHH \xHH \NNN and the abefnrtv letters
+	ucodeTemplateString	backtick string
+	ucodeTemplateExpr	${...} inside one
+	ucodeRegex		a regexp literal
+	ucodeRegexClass		a bracket expression inside one
+	ucodeRegexEscape	an escape inside one
+	ucodeCommentLine	//
+	ucodeCommentBlock	/* */
+	ucodeTodo		TODO FIXME XXX NOTE TBD HACK WARNING
+	ucodeShebang		the #! first line
+	ucodeOperator		operators, including ** ??= ?. and /=
+	ucodeDotOperator	. and ?.
+	ucodePropertyName	the name after either
+	ucodeObjectKey		a key in an object literal
+	ucodeFunctionCall	a name followed by (
+	ucodeFunctionName	a name after the function keyword
+	ucodeVariableName	a name after let or const
+	ucodePunctuation	( ) [ ] { } ; ,
+	ucodeSpaceError		trailing whitespace
+	ucodeJsError		see |ucode-errors|
+
+There are no digit separators in ucode: `1_000` is a syntax error, so it does
+not colour as a number. A `$` is a lexer error, so it is not part of an
+identifier the way a JavaScript syntax file would have it.
+
+A slash opens a regexp literal only where an operand is expected, mirroring
+the no_regexp flag the ucode compiler feeds back to its lexer. Everywhere else
+it is division.
+
+==============================================================================
+6. ERRORS FLAGGED					*ucode-errors*
+
+Unless |g:ucode_no_jsism_errors| is set, these are highlighted as errors. Each
+parses in JavaScript and is rejected by ucode:
+
+	undefined		use null
+	throw "..."		use die(), or return an error value
+	finally { }		try/catch only
+	new X			no constructors, use a factory and proto()
+	class X, extends X	no classes
+	do { } while ()		while and for only
+	typeof x		use type(x)
+	async, await		execution is synchronous
+	elseif			the keyword is elif
+	let [a] =, let {a} =	no destructuring, extract by hand
+	#			not a comment; only // and /* */ are
+
+Each is matched in the shape the JavaScript construct takes, not as a bare
+word, so the same names remain usable as ordinary identifiers.
+
+==============================================================================
+7. INDENTATION					*ucode-indent*
+
+Both block forms are handled: braces, and the colon form closed by endif,
+endfor, endwhile or endfunction. A brace-less single statement is indented and
+the following line is brought back out.
+
+In a switch, labels sit level with the switch and statements one level in,
+following the OpenWrt C convention.
+
+Lines are reduced to their code content through the syntax groups before any
+decision is made, so a brace inside a string, a comment or a regexp does not
+shift the file.
+
+Templates deliberately have no 'indentexpr', and 'smartindent' is switched off
+for them. See |ucode-templates|.
+
+==============================================================================
+8. FILETYPE PLUGIN					*ucode-ftplugin*
+
+'commentstring' is `// %s`.
+
+`gf` follows an import path. Both `'./lib/helper.uc'` and the dotted
+`'libs.mymodule'` form that REQUIRE_SEARCH_PATH resolves are understood;
+'suffixesadd' supplies the .uc extension.
+
+`:make` syntax-checks the buffer with `ucode -c` and fills the quickfix list.
+ucode prints no file name in its diagnostics, so 'makeprg' echoes the name
+first and the errorformat picks it up.
+
+						*ucode-make-modules*
+`:make` cannot check a module. `ucode -c` refuses any file containing an
+export statement, with "Exports may only appear at top level of a module".
+Point it at a script that imports the module instead.
+
+With matchit loaded, `%` jumps between if, elif, else and endif, and between
+the other colon-form pairs.
+
+==============================================================================
+9. TEMPLATES						*ucode-templates*
+
+Tags, as the template state machine in the ucode lexer defines them:
+
+	{#  {#-		comment		closed by  #}  -#}
+	{{  {{-		expression		   }}  -}}
+	{%  {%-  {%+	statement		   %}  -%}
+
+A `{` not followed by `#`, `{` or `%` is literal text. There is no `{{+`, and
+`+%}` is a syntax error rather than a trim marker.
+
+ucode has no Jinja filter pipeline. `{{ 6 | 1 }}` renders 7, a bitwise or.
+
+Auto-indenting is switched off for templates on purpose. Everything outside a
+tag is literal output, so its leading whitespace is part of the config file
+the template renders; re-indenting it changes the program's result. This
+includes 'smartindent', which many vimrcs set globally.
+
+==============================================================================
+10. TESTS						*ucode-tests*
+>
+	test/run.sh                 every fixture
+	test/run.sh --dump FILE     print FILE's syntax group map
+	test/run.sh --smoke DIR     no error group may fire on real code in DIR
+<
+The suite drives a real vim and asks synID() which group it assigned at a
+given position, so it exercises the shipped files rather than a model of them.
+Indent cases re-indent a fixture with `=` and compare byte for byte. Every
+fixture meant to be valid ucode is also handed to `ucode -c`.
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

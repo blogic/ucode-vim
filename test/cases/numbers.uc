@@ -1,0 +1,11 @@
+let dec = 42;
+let hexlower = 0xdeadbeef;
+let hexupper = 0XFF;
+let bin = 0b1010;
+let oct = 0o17;
+let legacy = 017;
+let frac = 1.5;
+let sci = 1.5e3;
+let negexp = 2E-4;
+let neg = -1;
+print(dec, hexlower, hexupper, bin, oct, legacy, frac, sci, negexp, neg);

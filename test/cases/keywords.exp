@@ -1,0 +1,40 @@
+ft ucode
+absent ucodeJsError   # nothing here is a JavaScript-ism
+absent ucodeRegex
+
+# Settings the filetype plugin is responsible for.
+opt commentstring // %s
+opt suffixesadd .uc,.ucode
+opt indentexpr UcodeIndentGet(v:lnum)
+
+4 1 ucodeFunction          # function
+4 10 ucodeFunctionName     # demo
+5 2 ucodeDeclaration       # let
+6 2 ucodeDeclaration       # const
+8 2 ucodeRepeat            # for
+8 16 ucodeOperatorKeyword  # in
+9 3 ucodeConditional       # if
+9 15 ucodeNull             # null
+10 4 ucodeBranch           # continue
+12 4 ucodeBranch           # break
+16 2 ucodeRepeat           # while
+19 2 ucodeConditional      # switch
+20 2 ucodeConditional      # case
+21 3 ucodeBranch           # return
+21 10 ucodeBoolean         # true
+22 2 ucodeConditional      # default
+23 10 ucodeBoolean         # false
+
+# Alternative block syntax, which the compiler accepts and the old file missed.
+30 2 ucodeConditional      # elif
+32 2 ucodeConditional      # else
+34 2 ucodeConditional      # endif
+38 2 ucodeRepeat           # endfor
+42 2 ucodeRepeat           # endwhile
+45 33 ucodeFunction        # endfunction
+
+47 13 ucodeObjectKey       # key
+49 1 ucodeException        # try
+50 2 ucodeOperatorKeyword  # delete
+51 3 ucodeException        # catch
+55 7 ucodeFunctionCall     # demo(

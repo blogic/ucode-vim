@@ -1,0 +1,23 @@
+ft ucode
+invalid   # deliberately not valid ucode
+
+3 9 ucodeJsError         # undefined
+4 9 ucodeJsError         # new
+5 1 ucodeJsError         # class
+5 11 ucodeJsError        # extends
+6 1 ucodeJsError         # do, of do-while
+7 17 ucodeJsError        # finally
+8 1 ucodeJsError         # throw
+9 9 ucodeJsError         # typeof
+10 1 ucodeJsError        # async function
+10 28 ucodeJsError       # await
+11 5 ucodeJsDestructure  # let [
+12 5 ucodeJsDestructure  # let {
+13 20 ucodeJsError       # elseif, which the old file taught as valid
+14 11 !ucodeNumber       # 1_000 has no digit separator in ucode
+14 12 !ucodeNumber
+15 1 ucodeJsError        # a bare # is a lexer error
+
+# try and while are still real keywords on those lines.
+6 16 ucodeRepeat
+7 1 ucodeException

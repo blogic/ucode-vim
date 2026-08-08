@@ -1,0 +1,8 @@
+ft ucode
+absent ucodeRegex   # the interpreter path is not a regexp literal
+
+1 1 ucodeShebang
+1 3 ucodeShebang    # the / that the old rule opened a regexp on
+1 20 ucodeShebang
+2 1 ucodeString
+3 12 ucodeString    # a path in a string stays a string

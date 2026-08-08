@@ -1,0 +1,31 @@
+ft ucode
+absent ucodeJsError
+
+# First and last name of each row, so a dropped entry in the keyword list shows
+# up rather than hiding behind its neighbours.
+6 2 ucodeBuiltin     # arrtoip
+6 53 ucodeBuiltin    # die
+7 2 ucodeBuiltin     # exists
+7 49 ucodeBuiltin    # hexdec
+8 2 ucodeBuiltin     # hexenc
+8 52 ucodeBuiltin    # keys
+9 2 ucodeBuiltin     # lc
+10 2 ucodeBuiltin    # max
+11 2 ucodeBuiltin    # regexp
+12 2 ucodeBuiltin    # signal
+13 2 ucodeBuiltin    # substr
+14 2 ucodeBuiltin    # uc
+14 41 ucodeBuiltin   # wildcard
+
+17 16 ucodeGlobal    # ARGV
+17 22 ucodeGlobal    # REQUIRE_SEARCH_PATH
+17 43 ucodeGlobal    # modules
+
+# The old file invented these. abs, round, floor and ceil belong to the math
+# module; reduce and jsonstr do not exist at all.
+20 15 !ucodeBuiltin  # abs
+20 20 !ucodeBuiltin  # round
+20 27 !ucodeBuiltin  # floor
+20 34 !ucodeBuiltin  # ceil
+20 40 !ucodeBuiltin  # reduce
+20 48 !ucodeBuiltin  # jsonstr

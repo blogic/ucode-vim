@@ -1,0 +1,13 @@
+ft ucode
+
+1 13 ucodeObjectKey       # key
+1 21 ucodeObjectKey       # other
+2 14 ucodeDotOperator
+2 15 ucodePropertyName    # obj.key, dead in the old file
+3 14 ucodeDotOperator     # ?. optional chaining
+3 16 ucodePropertyName
+4 20 ucodePropertyName    # second link of a chain
+5 15 ucodeOperator        # ... is the spread operator, not property access
+5 18 !ucodePropertyName
+6 11 ucodeFunctionCall    # compute(
+8 10 ucodeFunctionName    # named

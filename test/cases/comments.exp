@@ -1,0 +1,14 @@
+ft ucode
+absent ucodeRegex   # neither the URL nor the divisions inside comments
+
+1 1 ucodeCommentLine     # apostrophe inside a line comment
+1 40 ucodeCommentLine
+2 40 ucodeCommentLine    # http:// inside a line comment
+3 40 ucodeCommentLine    # a / b / c inside a line comment
+4 1 ucodeCommentBlock
+5 25 ucodeCommentBlock   # quotes inside a block comment
+6 4 ucodeTodo            # TODO
+8 12 ucodeCommentLine
+8 15 ucodeTodo           # FIXME
+9 1 ucodeCommentBlock    # block comment closed mid-line
+9 25 ucodeDeclaration    # and code resuming after it

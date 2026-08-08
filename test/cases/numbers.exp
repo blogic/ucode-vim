@@ -1,0 +1,12 @@
+ft ucode
+
+1 11 ucodeNumber   # 42
+2 16 ucodeNumber   # 0xdeadbeef
+3 16 ucodeNumber   # 0XFF
+4 11 ucodeNumber   # 0b1010
+5 11 ucodeNumber   # 0o17
+6 14 ucodeNumber   # 017, legacy octal
+7 12 ucodeFloat    # 1.5
+8 11 ucodeFloat    # 1.5e3
+9 14 ucodeFloat    # 2E-4
+10 12 ucodeNumber  # the sign of -1 is an operator, the digit a number

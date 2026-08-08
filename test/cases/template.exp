@@ -1,0 +1,35 @@
+ft ucode_template
+absent ucodeRegex        # the / on the metric line is division
+absent ucodeJsError
+
+opt commentstring {# %s #}
+# Literal text is the rendered output, so nothing may re-indent it.
+opt indentexpr
+opt smartindent 0
+
+# Literal text carries no group at all, so a config-file template is not
+# coloured as if it were HTML.
+1 1 NONE
+20 1 NONE
+20 8 NONE               # a lone { brace is text, not a tag
+
+2 19 ucodeTemplateDelim       # {{
+2 21 ucodeTemplateExprBlock
+2 31 ucodeTemplateDelim       # }}
+4 1 ucodeTemplateDelim        # {#
+4 3 ucodeTemplateComment
+4 48 ucodeTemplateDelim       # #}
+5 1 ucodeTemplateDelim        # {#- trimming comment
+5 24 ucodeTemplateDelim       # -#}
+7 1 ucodeTemplateDelim        # {%
+7 4 ucodeRepeat               # for, reached through the included ucode syntax
+7 19 ucodeOperatorKeyword     # in
+7 35 ucodeTemplateDelim       # %}
+9 31 ucodeOperator            # ?? inside an expression tag
+9 34 ucodeString
+11 4 ucodeRepeat              # endfor
+13 1 ucodeTemplateDelim       # {%-
+13 26 ucodeTemplateDelim      # -%}
+16 5 ucodeConditional         # endif
+18 1 ucodeTemplateDelim       # {%+, the tag the old file did not know
+18 5 ucodeBuiltin             # print

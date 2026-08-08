@@ -1,0 +1,5 @@
+# The headline defect: an unguarded regexp rule swallowed everything between
+# two divisions on the same line.
+ft ucode
+absent ucodeRegex
+present ucodeOperator

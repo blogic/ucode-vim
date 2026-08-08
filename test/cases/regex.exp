@@ -1,0 +1,12 @@
+ft ucode
+present ucodeRegex
+
+1 16 ucodePunctuation   # the comma keeps its own group
+1 18 ucodeRegex         # /^a+$/ opened after a comma
+2 18 ucodeRegex         # flags g and i are part of the literal
+3 20 ucodeRegex
+3 21 ucodeRegexClass    # [a-z]
+4 9 ucodeRegex          # /literal/ opened after =
+5 16 ucodeRegex         # /yes/ opened after ?
+5 24 ucodeRegex         # /no/ opened after :
+6 19 ucodeRegexEscape   # \s

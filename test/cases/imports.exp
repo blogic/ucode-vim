@@ -1,0 +1,16 @@
+ft ucode
+invalid   # a module: ucode -c refuses any file containing export
+
+1 1 ucodeImport         # import
+1 10 ucodeImportAs      # as, in the namespace form
+1 16 ucodeImportFrom    # from
+1 22 ucodeModuleName    # fs, only inside the source string
+2 26 ucodeModuleName    # socket
+3 39 ucodeModuleName    # uci
+4 24 ucodeModulePath    # a relative path is no module name
+4 26 !ucodeModuleName
+6 11 ucodeBuiltin       # require
+6 20 ucodeModuleName    # log, reached through require()
+7 21 ucodeModuleName    # ubus
+9 1 ucodeImport         # export
+11 8 ucodeFunction

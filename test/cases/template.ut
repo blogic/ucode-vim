@@ -1,0 +1,20 @@
+config system
+	option hostname '{{ hostname }}'
+
+{# a template comment, dropped from the output #}
+{#- a trimming comment -#}
+
+{% for (let iface in interfaces): %}
+config interface '{{ iface.name }}'
+	option proto '{{ iface.proto ?? "none" }}'
+	option metric {{ iface.metric / 2 }}
+{% endfor; %}
+
+{%- if (enable_logging): -%}
+config system
+	option log_size {{ log_size }}
+{%- endif; -%}
+
+{%+ print("kept indentation"); %}
+
+A lone { brace and a lone % sign are literal text.
